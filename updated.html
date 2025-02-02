@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Chat</title>
+    <title>Observatory Login</title>
     <style>
         body {
-            background-color: #333;
+            background-color: #1F363D;
             color: white;
             font-family: monospace;
             margin: 0;
@@ -16,6 +16,28 @@
             align-items: center;
             height: 100vh;
             position: relative;
+            overflow: hidden;
+        }
+
+        /* Grid of dots */
+        .grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 20px);
+            grid-template-rows: repeat(auto-fill, 20px);
+            pointer-events: none;
+        }
+
+        .dot {
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease-out;
         }
 
         .container {
@@ -23,44 +45,56 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
 
         .hollow-rectangle {
             width: 300px;
             padding: 10px;
-            border: 2px solid #171717; /* Hollow effect border */
-            border-radius: 15px; /* Rounded corners */
-            background-color: transparent; /* Transparent background */
-            margin-bottom: 15px; /* Space between rectangle and chat button */
+            border: 2px solid #40798C;
+            border-radius: 15px;
+            background-color: transparent;
+            margin-bottom: 15px;
             display: flex;
             justify-content: center;
-            position: relative; /* Needed for absolute positioning of text */
+            position: relative;
         }
 
         .input-text {
             position: absolute;
-            padding: 2px;
-            top: -10px; /* Position the text above the top edge */
+            top: -10px;
             left: 50%;
-            transform: translateX(-50%); /* Centre the text horizontally */
-            color: #171717; /* Text colour */
+            background-color: #1F363D;
+            padding-left: 3px;
+            padding-right: 3px;
+            transform: translateX(-50%);
+            color: #40798C;
             font-size: 1.2em;
             font-family: monospace;
-            background-color: #333333;
-            z-index: 1; /* Ensure the text stays on top of the border */
+            z-index: 1;
         }
 
         .text-field {
             width: 100%;
             padding: 10px;
-            background-color: transparent; /* Inside is transparent */
-            border: transparent; /* Border is #171717 */
+            padding-top: 20px;
+            background-color: transparent;
+            border: transparent;
             color: white;
             font-family: monospace;
             font-size: 1em;
             text-align: center;
-            border-radius: 5px; /* Slightly rounded corners */
-            z-index: 0; /* Ensure the input field stays below the text */
+            border-radius: 5px;
+            z-index: 0;
+            outline: none;
+            
+        }
+
+        .text-field:focus {
+            background-color: transparent;
+            border-color: #171717;
+            box-shadow: none;
         }
 
         .chat-button {
@@ -69,7 +103,7 @@
             right: 20px;
             width: 50px;
             height: 50px;
-            background-color: blue;
+            background-color: #40798C;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -80,23 +114,28 @@
 
         .chat-button.expanded {
             width: 300px;
-            height: 400px;
+            height: auto;
+            max-width: 400px;
             border-radius: 20px;
-            background-color: #444;
+            background-color: #40798C;
             flex-direction: column;
             padding: 10px;
+            overflow: hidden;
         }
 
         .chat-icon {
-            width: 30px; /* Adjust size of the icon */
-            height: 30px; /* Adjust size of the icon */
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
         .chat-box {
             display: none;
             flex-direction: column;
+            width: 100%;
             height: 100%;
+            overflow-y: auto;
+            max-height: calc(100vh - 100px);
         }
 
         .chat-button.expanded .chat-box {
@@ -107,8 +146,8 @@
             width: calc(100% - 20px);
             padding: 10px;
             border: none;
-            background-color: #222;
-            color: white;
+            background-color: #40798C;
+            color: whitesmoke;
             font-family: monospace;
             margin-top: auto;
         }
@@ -133,24 +172,58 @@
         }
 
         .message-text {
-            background-color: #555;
+            background-color: #70A9A1;
             padding: 5px 10px;
             border-radius: 10px;
         }
 
         .label {
             font-size: 0.8em;
-            color: #bbb;
+            color: whitesmoke;
             margin-bottom: 2px;
+        }
+        .chat-input::placeholder {
+            color: whitesmoke;
+        }
+        .text-field::placeholder {
+            color: whitesmoke;
+        }
+        .hidden-text {
+            font-family: monospace; /* Keep your chosen font */
+            -webkit-text-security: disc; /* Hide characters like a password field */
+            letter-spacing: 2px; /* Optional: Adjust spacing to mimic password styling */
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            .chat-button.expanded {
+                width: 100%;
+                height: auto;
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .chat-box {
+                height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+
+            .chat-input {
+                margin-top: 10px;
+                padding-bottom: 10px;
+            }
         }
 
     </style>
 </head>
 <body>
+    <!-- Grid overlay -->
+    <div class="grid"></div>
+
     <div class="container">
         <div class="hollow-rectangle">
-            <span class="input-text">Input</span>
-            <input type="text" class="text-field" placeholder="Type your message..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <span class="input-text">password</span>
+            <input type="text" class="text-field hidden-text" placeholder="enter your password" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         
         <div class="chat-button" id="chatButton">
@@ -160,90 +233,190 @@
                 <input type="text" id="chatInput" class="chat-input" placeholder="Send a message to the observer">
             </div>
         </div>
-    </div>       
-    
+    </div>
+
     <script>
         const chatButton = document.getElementById("chatButton");
         const chatBox = document.getElementById("chatBox");
         const chatInput = document.getElementById("chatInput");
         const chatOutput = document.getElementById("chatOutput");
-        
+
+        let isChatOpen = false; // Track whether the chat is open
+        let lastSender = "";
+
+        async function getProfileData() {
+            try {
+                const response = await fetch('assets/profiles.json');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Failed to load profiles:", error);
+                return {};
+            }
+        }
+
         async function getRandomResponse() {
             try {
                 const response = await fetch('assets/responses.json');
                 const data = await response.json();
                 const keys = Object.keys(data);
-                return data[keys[Math.floor(Math.random() * keys.length)]];
+                return data[keys[Math.floor(Math.random() * keys.length)]]; 
             } catch (error) {
                 return "Failed to load responses.";
             }
         }
 
         chatButton.addEventListener("click", (event) => {
-            if (!chatButton.classList.contains("expanded")) {
+            if (isChatOpen) {
+                chatButton.classList.remove("expanded");
+                chatBox.style.display = "none";
+                chatOutput.innerHTML = "";
+                isChatOpen = false;
+            } else {
                 chatButton.classList.add("expanded");
+                chatBox.style.display = "flex";
+                isChatOpen = true;
             }
             event.stopPropagation();
         });
-        
+
         chatInput.addEventListener("click", (event) => {
             event.stopPropagation();
         });
-        
+
         chatInput.addEventListener("keydown", async (event) => {
             if (event.key === "Enter" && chatInput.value.trim() !== "") {
                 const message = chatInput.value.trim();
                 chatInput.value = "";
                 displayMessage("You", "assets/user.png", message);
-                
+
                 let response;
-                if (message === "specific prompt") {
-                    response = "Hello!!!";
+                
+                // Fetching and decoding from JSON if the message is a specific prompt
+                if (message === "wazzo" || message === "other_key") {
+                    try {
+                        const responseData = await fetch('assets/responses.json');
+                        const data = await responseData.json();
+                        
+                        // Function to decode character codes
+                        const decodeFromCodes = (codes) => {
+                            return String.fromCharCode(...codes.split(" ").map(num => parseInt(num, 10)));
+                        };
+
+                        // Check if the message matches a key in the JSON
+                        if (data[message]) {
+                            const entry = data[message];
+                            response1 = `${entry.rating}`;
+                            response2 = `${decodeFromCodes(entry.bio)}`;
+                            response3 = `${decodeFromCodes(entry.about)}`;
+                            displayMultipleResponses(response1, response2, response3)
+                        } else {
+                            response = "No matching entry found.";
+                        }
+                    } catch (error) {
+                        response = "Failed to load data from JSON.";
+                    }
                 } else if (message === "222") {
                     response = "Special response for 222";
                 } else {
                     response = await getRandomResponse();
                 }
-                displayMessage("Observer", "assets/observer.png", response, true);
+                
+                if (response != null) {
+                    displayMessage("Observer", "assets/observer.png", response, true);
+                }
             }
         });
-        
+
+        function displayMultipleResponses(response1, response2, response3) {
+            displayMessage("Observer", "assets/observer.png", response1, false);
+            displayMessage("Observer", "assets/observer.png", response2, false);
+            displayMessage("Observer", "assets/observer.png", response3, false);
+        }
+
         function displayMessage(sender, imgSrc, text, animate = false) {
             const messageContainer = document.createElement("div");
             messageContainer.classList.add("message-container");
-            
+
             const profilePic = document.createElement("img");
-            profilePic.src = imgSrc;
-            
+            // If the sender is the same, use a default or new profile image
+            profilePic.src = (sender !== lastSender) ? imgSrc : "assets/none.png";  // Change to your default PFP
+
             const messageWrapper = document.createElement("div");
             const label = document.createElement("div");
             label.classList.add("label");
-            label.textContent = sender;
-            
+            // If the sender is the same, use an empty string for the name
+            label.textContent = (sender !== lastSender) ? sender : "";  
+
             const messageText = document.createElement("div");
             messageText.classList.add("message-text");
-            
+
             messageWrapper.appendChild(label);
             messageWrapper.appendChild(messageText);
-            
+
             messageContainer.appendChild(profilePic);
             messageContainer.appendChild(messageWrapper);
             chatOutput.appendChild(messageContainer);
-            
+
+            // Update lastSender
+            lastSender = sender;
+
             if (animate) {
-                let words = text.split(" ");
+                let words = text.split("\n");
                 let index = 0;
                 function revealWord() {
                     if (index < words.length) {
-                        messageText.textContent += (index > 0 ? " " : "") + words[index];
+                        const messageTextElement = messageContainer.querySelector(".message-text");
+                        messageTextElement.textContent += (index > 0 ? "\n" : "") + words[index];
                         index++;
-                        setTimeout(revealWord, 200);
+                        setTimeout(revealWord, 500);
                     }
                 }
                 revealWord();
             } else {
-                messageText.textContent = text;
+                messageContainer.querySelector(".message-text").textContent = text;
             }
+        }
+
+        // List of random colours for the circles
+        const colours = ["#40798C", "#70A9A1", "#9EC1A3", "#CFE0C3"];
+
+        document.body.addEventListener('mousemove', (event) => {
+            createCircle(event.pageX, event.pageY);
+        });
+
+        function createCircle(x, y) {
+            const circle = document.createElement("div");
+            const size = Math.random() * 10 + 5;  // Random size between 5px and 15px
+            const colour = colours[Math.floor(Math.random() * colours.length)]; // Random colour from list
+
+            circle.style.position = "absolute";
+            circle.style.width = `${size}px`;
+            circle.style.height = `${size}px`;
+            circle.style.backgroundColor = colour;
+            circle.style.borderRadius = "50%";
+            circle.style.left = `${x - size / 2}px`;
+            circle.style.top = `${y - size / 2}px`;
+            circle.style.pointerEvents = "none";
+            document.body.appendChild(circle);
+
+            const angle = Math.random() * Math.PI * 2; // Random direction
+            const speed = Math.random() * 3 + 2; // Random speed
+            const velocityX = Math.cos(angle) * speed;
+            const velocityY = Math.sin(angle) * speed;
+
+            let opacity = 1;
+            const fadeOutInterval = setInterval(() => {
+                circle.style.left = `${parseFloat(circle.style.left) + velocityX}px`;
+                circle.style.top = `${parseFloat(circle.style.top) + velocityY}px`;
+                opacity -= 0.02;
+                circle.style.opacity = opacity;
+
+                if (opacity <= 0) {
+                    clearInterval(fadeOutInterval);
+                    circle.remove();
+                }
+            }, 16);
         }
     </script>
 </body>
