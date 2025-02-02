@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Chat</title>
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .hollow-rectangle {
+            width: 300px;
+            padding: 10px;
+            border: 2px solid #171717; /* Hollow effect border */
+            border-radius: 15px; /* Rounded corners */
+            background-color: transparent; /* Transparent background */
+            margin-bottom: 15px; /* Space between rectangle and chat button */
+            display: flex;
+            justify-content: center;
+            position: relative; /* Needed for absolute positioning of text */
+        }
+
+        .input-text {
+            position: absolute;
+            padding: 2px;
+            top: -10px; /* Position the text above the top edge */
+            left: 50%;
+            transform: translateX(-50%); /* Centre the text horizontally */
+            color: #171717; /* Text colour */
+            font-size: 1.2em;
+            font-family: monospace;
+            background-color: #333333;
+            z-index: 1; /* Ensure the text stays on top of the border */
+        }
+
+        .text-field {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent; /* Inside is transparent */
+            border: transparent; /* Border is #171717 */
+            color: white;
+            font-family: monospace;
+            font-size: 1em;
+            text-align: center;
+            border-radius: 5px; /* Slightly rounded corners */
+            z-index: 0; /* Ensure the input field stays below the text */
+        }
+
+        .chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: blue;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-button.expanded {
+            width: 300px;
+            height: 400px;
+            border-radius: 20px;
+            background-color: #444;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .chat-icon {
+            width: 30px; /* Adjust size of the icon */
+            height: 30px; /* Adjust size of the icon */
+            object-fit: contain;
+        }
+
+        .chat-box {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-button.expanded .chat-box {
+            display: flex;
+        }
+
+        .chat-input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: none;
+            background-color: #222;
+            color: white;
+            font-family: monospace;
+            margin-top: auto;
+        }
+
+        .chat-output {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+
+        .message-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        .message-container img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .message-text {
+            background-color: #555;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .label {
+            font-size: 0.8em;
+            color: #bbb;
+            margin-bottom: 2px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hollow-rectangle">
+            <span class="input-text">Input</span>
+            <input type="text" class="text-field" placeholder="Type your message..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        
+        <div class="chat-button" id="chatButton">
+            <img src="assets/chat.png" alt="Chat Icon" class="chat-icon">
+            <div class="chat-box" id="chatBox">
+                <div class="chat-output" id="chatOutput"></div>
+                <input type="text" id="chatInput" class="chat-input" placeholder="Send a message to the observer">
+            </div>
+        </div>
+    </div>       
+    
+    <script>
+        const chatButton = document.getElementById("chatButton");
+        const chatBox = document.getElementById("chatBox");
+        const chatInput = document.getElementById("chatInput");
+        const chatOutput = document.getElementById("chatOutput");
+        
+        async function getRandomResponse() {
+            try {
+                const response = await fetch('assets/responses.json');
+                const data = await response.json();
+                const keys = Object.keys(data);
+                return data[keys[Math.floor(Math.random() * keys.length)]];
+            } catch (error) {
+                return "Failed to load responses.";
+            }
+        }
+
+        chatButton.addEventListener("click", (event) => {
+            if (!chatButton.classList.contains("expanded")) {
+                chatButton.classList.add("expanded");
+            }
+            event.stopPropagation();
+        });
+        
+        chatInput.addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+        
+        chatInput.addEventListener("keydown", async (event) => {
+            if (event.key === "Enter" && chatInput.value.trim() !== "") {
+                const message = chatInput.value.trim();
+                chatInput.value = "";
+                displayMessage("You", "assets/user.png", message);
+                
+                let response;
+                if (message === "specific prompt") {
+                    response = "Hello!!!";
+                } else if (message === "222") {
+                    response = "Special response for 222";
+                } else {
+                    response = await getRandomResponse();
+                }
+                displayMessage("Observer", "assets/observer.png", response, true);
+            }
+        });
+        
+        function displayMessage(sender, imgSrc, text, animate = false) {
+            const messageContainer = document.createElement("div");
+            messageContainer.classList.add("message-container");
+            
+            const profilePic = document.createElement("img");
+            profilePic.src = imgSrc;
+            
+            const messageWrapper = document.createElement("div");
+            const label = document.createElement("div");
+            label.classList.add("label");
+            label.textContent = sender;
+            
+            const messageText = document.createElement("div");
+            messageText.classList.add("message-text");
+            
+            messageWrapper.appendChild(label);
+            messageWrapper.appendChild(messageText);
+            
+            messageContainer.appendChild(profilePic);
+            messageContainer.appendChild(messageWrapper);
+            chatOutput.appendChild(messageContainer);
+            
+            if (animate) {
+                let words = text.split(" ");
+                let index = 0;
+                function revealWord() {
+                    if (index < words.length) {
+                        messageText.textContent += (index > 0 ? " " : "") + words[index];
+                        index++;
+                        setTimeout(revealWord, 200);
+                    }
+                }
+                revealWord();
+            } else {
+                messageText.textContent = text;
+            }
+        }
+    </script>
+</body>
+</html>
