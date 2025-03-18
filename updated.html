@@ -399,7 +399,20 @@
             items.forEach(item => {
                 const li = document.createElement('li');
                 li.className = item.type;
-                li.innerHTML = item.name;
+        
+                if (item.type === 'file') {
+                    // Create a download link for files
+                    const fileLink = document.createElement('a');
+                    fileLink.href = `explore/${item.name}`; // Path to the file in the `files/` directory
+                    fileLink.download = item.name; // Set the download attribute
+                    fileLink.textContent = item.name;
+                    fileLink.style.color = 'white'; // Match your theme
+                    fileLink.style.textDecoration = 'none'; // Remove underline
+                    li.appendChild(fileLink);
+                } else {
+                    // Display folder name
+                    li.textContent = item.name;
+                }
         
                 if (item.type === 'folder') {
                     li.addEventListener("click", (e) => {
