@@ -325,10 +325,12 @@
         // File Explorer Functionality
         const fileExplorerButton = document.getElementById("fileExplorerButton");
         let isExplorerOpen = false;
-
+        
         function toggleFileExplorer() {
             if (isExplorerOpen) {
+                // Close the explorer and clear the content
                 fileExplorerButton.classList.remove("expanded");
+                document.getElementById('explorer').innerHTML = '';  // Clear file explorer content
                 isExplorerOpen = false;
             } else {
                 // Close chat if open
@@ -339,10 +341,10 @@
                 }
                 fileExplorerButton.classList.add("expanded");
                 isExplorerOpen = true;
-                loadFileTree();
+                loadFileTree();  // Load the file tree again
             }
         }
-
+        
         // Handle clicks on the file explorer button
         fileExplorerButton.addEventListener("click", (event) => {
             if (!isExplorerOpen) {
@@ -350,19 +352,19 @@
             }
             event.stopPropagation();
         });
-
+        
         // Close explorer when clicking outside
         document.addEventListener("click", () => {
             if (isExplorerOpen) {
                 toggleFileExplorer();
             }
         });
-
+        
         // Prevent closing when clicking inside explorer
         document.getElementById("fileExplorerContent").addEventListener("click", (event) => {
             event.stopPropagation();
         });
-
+        
         // Function to load the file tree from the backend
         async function loadFileTree() {
             const mockData = [
@@ -389,7 +391,7 @@
             ];
             renderExplorer(mockData, document.getElementById('explorer'));
         }
-
+        
         // Function to render the file explorer
         function renderExplorer(items, parentElement) {
             const ul = document.createElement('ul');
@@ -398,7 +400,7 @@
                 const li = document.createElement('li');
                 li.className = item.type;
                 li.innerHTML = item.name;
-
+        
                 if (item.type === 'folder') {
                     li.addEventListener("click", (e) => {
                         e.stopPropagation();
@@ -408,12 +410,12 @@
                             item.childrenRendered = true;
                         }
                     });
-
+        
                     const childrenDiv = document.createElement('div');
                     childrenDiv.className = 'children';
                     li.appendChild(childrenDiv);
                 }
-
+        
                 ul.appendChild(li);
             });
             parentElement.appendChild(ul);
