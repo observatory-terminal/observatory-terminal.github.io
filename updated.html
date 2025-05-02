@@ -368,26 +368,92 @@
         // Function to load the file tree from the backend
         async function loadFileTree() {
             const mockData = [
-                {
-                    "name": "explore",
-                    "type": "folder",
-                    "children": [
-                        {
-                            "name": "test.md",
-                            "type": "file"
-                        },
-                        {
-                            "name": "child",
-                            "type": "folder",
-                            "children": [
-                                {
-                                    "name": "testchild.md",
-                                    "type": "file"
-                                }
-                            ]
-                        }
-                    ]
-                }
+            {
+                "name": "explore",
+                "type": "folder",
+                "children": [
+                    {
+                        "name": "storage",
+                        "type": "folder",
+                        "children": [
+                            {
+                                "name": "file1 (locked folder)",
+                                "type": "folder",
+                                "children": []
+                            },
+                            {
+                                "name": "file2 (locked folder)",
+                                "type": "folder",
+                                "children": []
+                            },
+                            {
+                                "name": "heretic",
+                                "type": "folder",
+                                "children": []
+                            },
+                            {
+                                "name": "image1 (locked folder)",
+                                "type": "folder",
+                                "children": []
+                            },
+                            {
+                                "name": "image2 (locked folder)",
+                                "type": "folder",
+                                "children": []
+                            },
+                            {
+                                "name": "image3 (locked folder)",
+                                "type": "folder",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "users",
+                        "type": "folder",
+                        "children": [
+                            {
+                                "name": "horse",
+                                "type": "folder",
+                                "children": [
+                                    {
+                                        "name": "code",
+                                        "type": "folder",
+                                        "children": []
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "nathaniel",
+                                "type": "folder",
+                                "children": [
+                                    {
+                                        "name": "code",
+                                        "type": "folder",
+                                        "children": [
+                                            {
+                                                "name": "security.png",
+                                                "type": "file"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "tyson",
+                                "type": "folder",
+                                "children": [
+                                    {
+                                        "name": "code (locked folder)",
+                                        "type": "folder",
+                                        "children": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
             ];
             renderExplorer(mockData, document.getElementById('explorer'));
         }
